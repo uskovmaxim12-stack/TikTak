@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TikTok - Регистрация и вход</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --tiktok-red: #FF0050;
+            --tiktok-blue: #00F2EA;
+            --tiktok-black: #000000;
+            --tiktok-white: #FFFFFF;
+            --tiktok-gray: #EFEFEF;
+            --tiktok-dark: #121212;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #app {
+            height: 100vh;
+            position: relative;
+        }
+
+        /* ===== ЗАГРУЗЧИК ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loader-logo {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== ШАПКА ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            font-size: 20px;
+        }
+
+        /* ===== ЭКРАН РЕГИСТРАЦИИ/ВХОДА ===== */
+        .auth-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(45deg, #000, #121212);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .auth-tab.active {
+            color: var(--tiktok-white);
+            border-bottom-color: var(--tiktok-red);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--tiktok-red);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-input.error {
+            border-color: #ff4757;
+        }
+
+        .error-message {
+            color: #ff4757;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .auth-btn:active {
+            transform: scale(0.98);
+        }
+
+        .auth-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .auth-link {
+            color: var(--tiktok-blue);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* ===== ГЛАВНЫЙ ЭКРАН ===== */
+        .main-screen {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* ЛЕНТА ВИДЕО */
+        .video-feed {
+            flex: 1;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .video-container {
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
+        }
+
+        /* ИНФОРМАЦИЯ О ВИДЕО */
+        .video-overlay {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            padding: 0 16px;
+            z-index: 2;
+        }
+
+        .video-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .username {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .follow-btn {
+            background: var(--tiktok-red);
+            color: white;
+            border: none;
+            padding: 6px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .video-caption {
+            font-size: 15px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .sound-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 12px;
+        }
+
+        .hashtags {
+            font-size: 14px;
+            color: var(--tiktok-blue);
+        }
+
+        /* ПРАВАЯ ПАНЕЛЬ */
+        .right-panel {
+            position: absolute;
+            right: 16px;
+            bottom: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 3;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .action-count {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* НИЖНЕЕ МЕНЮ */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 22px;
+            width: 64px;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--tiktok-white);
+        }
+
+        .nav-text {
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .create-btn {
+            position: fixed;
+            bottom: 50px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 25px rgba(255, 0, 80, 0.3);
+        }
+
+        /* ===== УВЕДОМЛЕНИЯ ===== */
+        .notification {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            z-index: 2001;
+            animation: slideDown 0.3s ease-out;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+            
+            .header { height: 44px; }
+            .bottom-nav { height: 48px; }
+            .create-btn { bottom: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- ЗАГРУЗЧИК -->
+        <div id="loader">
+            <div class="loader-logo">TikTok</div>
+            <div style="color: #666; font-size: 14px; margin-top: 10px;">Загрузка...</div>
+        </div>
+
+        <!-- ЭКРАН РЕГИСТРАЦИИ/ВХОДА -->
+        <div class="auth-screen" id="authScreen">
+            <div class="auth-container">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" onclick="switchAuthTab('login')">Вход</div>
+                    <div class="auth-tab" onclick="switchAuthTab('register')">Регистрация</div>
+                </div>
+                
+                <!-- ФОРМА ВХОДА -->
+                <div class="auth-form active" id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Имя пользователя или Email</label>
+                        <input type="text" class="form-input" id="loginUsername" placeholder="Введите имя пользователя или email">
+                        <div class="error-message" id="loginUsernameError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" id="loginPassword" placeholder="Введите пароль">
+                        <div class="error-message" id="loginPasswordError"></div>
+                    </div>
+                    
+                    <button class="auth-btn" onclick="login()" id="loginBtn">
+                        <span>Войти</span>
+                        <span style="display:none;" id="loginLoading">
+                            <i class="fas fa-spinner fa-spin"></i> Вход...
+                        </span>
+                    </button>
+                    
+                    <div class="auth-footer">
+                        <div style="margin-bottom: 10px;">Демо аккаунты:</div>
+                        <div style="font-size: 11px; color: #888; margin-bottom: 5px;">
+                            tiktok_trends / demo123
+                        </div>
+                        <div style="font-size: 11px; color: #888;">
+                            dance_queen / demo123
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ФОРМА РЕГИСТРАЦИИ -->
+                <div class="auth-form" id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-input" id="registerUsername" placeholder="Придумайте имя пользователя">
+                        <div class="error-message" id="registerUsernameError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="registerEmail" placeholder="Введите ваш email">
+                        <div class="error-message" id="registerEmailError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" id="registerPassword" placeholder="Придумайте пароль (минимум 6 символов)">
+                        <div class="error-message" id="registerPasswordError"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Подтвердите пароль</label>
+                        <input type="password" class="form-input" id="registerConfirmPassword" placeholder="Повторите пароль">
+                        <div class="error-message" id="registerConfirmPasswordError"></div>
+                    </div>
+                    
+                    <button class="auth-btn" onclick="register()" id="registerBtn">
+                        <span>Зарегистрироваться</span>
+                        <span style="display:none;" id="registerLoading">
+                            <i class="fas fa-spinner fa-spin"></i> Регистрация...
+                        </span>
+                    </button>
+                    
+                    <div class="auth-footer">
+                        Регистрируясь, вы соглашаетесь с 
+                        <span class="auth-link" onclick="showTerms()">Условиями использования</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <div class="main-screen" id="mainScreen">
+            <!-- ШАПКА -->
+            <div class="header">
+                <div class="logo">TikTok</div>
+                <div class="header-actions">
+                    <i class="fas fa-search" onclick="showSearch()"></i>
+                    <i class="fas fa-inbox" onclick="showInbox()"></i>
+                    <div class="user-avatar" id="headerAvatar" onclick="showProfile()" style="width:30px;height:30px;cursor:pointer;"></div>
+                </div>
+            </div>
+
+            <!-- ЛЕНТА ВИДЕО -->
+            <div class="video-feed" id="videoFeed">
+                <!-- Видео загружаются динамически -->
+            </div>
+
+            <!-- ПРАВАЯ ПАНЕЛЬ -->
+            <div class="right-panel">
+                <div class="action-btn">
+                    <div class="action-icon" onclick="likeVideo()">
+                        <i class="fas fa-heart" id="likeIcon"></i>
+                    </div>
+                    <div class="action-count" id="likeCount">0</div>
+                </div>
+                
+                <div class="action-btn">
+                    <div class="action-icon" onclick="showComments()">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <div class="action-count" id="commentCount">0</div>
+                </div>
+                
+                <div class="action-btn">
+                    <div class="action-icon" onclick="shareVideo()">
+                        <i class="fas fa-share"></i>
+                    </div>
+                    <div class="action-count" id="shareCount">0</div>
+                </div>
+                
+                <div class="action-btn">
+                    <div class="action-icon" onclick="saveVideo()">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- НИЖНЕЕ МЕНЮ -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showFeed()">
+                    <i class="fas fa-home"></i>
+                    <div class="nav-text">Главная</div>
+                </div>
+                <div class="nav-item" onclick="showSearch()">
+                    <i class="fas fa-search"></i>
+                    <div class="nav-text">Поиск</div>
+                </div>
+                <div class="create-btn" onclick="showUpload()">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="nav-item" onclick="showInbox()">
+                    <i class="fas fa-inbox"></i>
+                    <div class="nav-text">Входящие</div>
+                </div>
+                <div class="nav-item" onclick="showProfile()">
+                    <i class="fas fa-user"></i>
+                    <div class="nav-text">Я</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================== КОНФИГУРАЦИЯ ======================
+        const API_URL = 'http://localhost:3000/api';
+        let currentUser = null;
+        let currentVideo = null;
+        let videos = [];
+        let token = localStorage.getItem('tiktok_token');
+
+        // ====================== ИНИЦИАЛИЗАЦИЯ ======================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Скрываем загрузчик через 1 секунду
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+            }, 1000);
+            
+            // Проверяем авторизацию
+            await checkAuth();
+        });
+
+        // ====================== АВТОРИЗАЦИЯ ======================
+        async function checkAuth() {
+            if (!token) {
+                showAuthScreen();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/verify`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    showMainScreen();
+                    loadFeed();
+                } else {
+                    localStorage.removeItem('tiktok_token');
+                    localStorage.removeItem('tiktok_user');
+                    showAuthScreen();
+                }
+            } catch (error) {
+                console.log('Ошибка проверки токена:', error);
+                localStorage.removeItem('tiktok_token');
+                localStorage.removeItem('tiktok_user');
+                showAuthScreen();
+            }
+        }
+
+        function showAuthScreen() {
+            document.getElementById('authScreen').style.display = 'flex';
+            document.getElementById('mainScreen').style.display = 'none';
+        }
+
+        function showMainScreen() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainScreen').style.display = 'flex';
+            
+            // Устанавливаем аватар в шапке
+            if (currentUser && currentUser.profilePic) {
+                document.getElementById('headerAvatar').innerHTML = 
+                    `<img src="${currentUser.profilePic}" alt="${currentUser.username}">`;
+            }
+        }
+
+        // ====================== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ======================
+        function switchAuthTab(tab) {
+            // Переключаем вкладки
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+            
+            // Очищаем ошибки
+            clearErrors();
+        }
+
+        // ====================== ВАЛИДАЦИЯ ======================
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+            document.querySelectorAll('.form-input').forEach(el => {
+                el.classList.remove('error');
+            });
+        }
+
+        function showError(inputId, message) {
+            const input = document.getElementById(inputId);
+            const errorEl = document.getElementById(inputId + 'Error');
+            
+            if (input && errorEl) {
+                input.classList.add('error');
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            }
+        }
+
+        function validateLoginForm() {
+            clearErrors();
+            let isValid = true;
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            if (!username) {
+                showError('loginUsername', 'Введите имя пользователя или email');
+                isValid = false;
+            }
+            
+            if (!password) {
+                showError('loginPassword', 'Введите пароль');
+                isValid = false;
+            } else if (password.length < 6) {
+                showError('loginPassword', 'Пароль должен быть не менее 6 символов');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function validateRegisterForm() {
+            clearErrors();
+            let isValid = true;
+            
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value.trim();
+            const confirmPassword = document.getElementById('registerConfirmPassword').value.trim();
+            
+            // Валидация имени пользователя
+            if (!username) {
+                showError('registerUsername', 'Введите имя пользователя');
+                isValid = false;
+            } else if (username.length < 3) {
+                showError('registerUsername', 'Имя пользователя должно быть не менее 3 символов');
+                isValid = false;
+            } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showError('registerUsername', 'Имя пользователя может содержать только буквы, цифры и _');
+                isValid = false;
+            }
+            
+            // Валидация email
+            if (!email) {
+                showError('registerEmail', 'Введите email');
+                isValid = false;
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showError('registerEmail', 'Введите корректный email');
+                isValid = false;
+            }
+            
+            // Валидация пароля
+            if (!password) {
+                showError('registerPassword', 'Введите пароль');
+                isValid = false;
+            } else if (password.length < 6) {
+                showError('registerPassword', 'Пароль должен быть не менее 6 символов');
+                isValid = false;
+            }
+            
+            // Подтверждение пароля
+            if (!confirmPassword) {
+                showError('registerConfirmPassword', 'Подтвердите пароль');
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                showError('registerConfirmPassword', 'Пароли не совпадают');
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        // ====================== РЕГИСТРАЦИЯ ======================
+        async function register() {
+            if (!validateRegisterForm()) return;
+            
+            const btn = document.getElementById('registerBtn');
+            const text = btn.querySelector('span:first-child');
+            const loading = document.getElementById('registerLoading');
+            
+            // Показываем индикатор загрузки
+            text.style.display = 'none';
+            loading.style.display = 'inline';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: document.getElementById('registerUsername').value.trim(),
+                        email: document.getElementById('registerEmail').value.trim(),
+                        password: document.getElementById('registerPassword').value.trim()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Сохраняем токен и пользователя
+                    token = data.token;
+                    currentUser = data.user;
+                    
+                    localStorage.setItem('tiktok_token', token);
+                    localStorage.setItem('tiktok_user', JSON.stringify(currentUser));
+                    
+                    showNotification('Регистрация успешна! Добро пожаловать в TikTok!');
+                    
+                    // Переключаемся на главный экран
+                    setTimeout(() => {
+                        showMainScreen();
+                        loadFeed();
+                    }, 1000);
+                    
+                } else {
+                    // Показываем ошибку с сервера
+                    if (data.details) {
+                        showError('registerUsername', data.details);
+                    } else {
+                        showError('registerUsername', data.error || 'Ошибка регистрации');
+                    }
+                    
+                    showNotification(data.error || 'Ошибка регистрации');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка регистрации:', error);
+                showError('registerUsername', 'Ошибка соединения с сервером');
+                showNotification('Ошибка соединения с сервером');
+            } finally {
+                // Возвращаем кнопку в исходное состояние
+                text.style.display = 'inline';
+                loading.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        // ====================== ВХОД ======================
+        async function login() {
+            if (!validateLoginForm()) return;
+            
+            const btn = document.getElementById('loginBtn');
+            const text = btn.querySelector('span:first-child');
+            const loading = document.getElementById('loginLoading');
+            
+            // Показываем индикатор загрузки
+            text.style.display = 'none';
+            loading.style.display = 'inline';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: document.getElementById('loginUsername').value.trim(),
+                        password: document.getElementById('loginPassword').value.trim()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Сохраняем токен и пользователя
+                    token = data.token;
+                    currentUser = data.user;
+                    
+                    localStorage.setItem('tiktok_token', token);
+                    localStorage.setItem('tiktok_user', JSON.stringify(currentUser));
+                    
+                    showNotification('Вход выполнен успешно!');
+                    
+                    // Переключаемся на главный экран
+                    setTimeout(() => {
+                        showMainScreen();
+                        loadFeed();
+                    }, 500);
+                    
+                } else {
+                    // Показываем ошибку с сервера
+                    if (data.details) {
+                        showError('loginUsername', data.details);
+                    } else {
+                        showError('loginUsername', data.error || 'Ошибка входа');
+                    }
+                    
+                    showNotification(data.error || 'Ошибка входа');
+                }
+                
+            } catch (error) {
+                console.error('Ошибка входа:', error);
+                showError('loginUsername', 'Ошибка соединения с сервером');
+                showNotification('Ошибка соединения с сервером');
+            } finally {
+                // Возвращаем кнопку в исходное состояние
+                text.style.display = 'inline';
+                loading.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        // ====================== ЛЕНТА ВИДЕО ======================
+        async function loadFeed() {
+            try {
+                const response = await fetch(`${API_URL}/videos/feed`);
+                videos = await response.json();
+                renderVideos();
+            } catch (error) {
+                console.error('Ошибка загрузки ленты:', error);
+                // Используем демо видео при ошибке
+                videos = [
+                    {
+                        id: 'video1',
+                        username: 'tiktok_trends',
+                        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1',
+                        thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
+                        caption: 'Тренд 2024! Все танцуют этот танец 🎵 #танец #тренд2024',
+                        sound: 'Оригинальный звук',
+                        likes: 1250000,
+                        comments: 23400,
+                        shares: 89000,
+                        views: 5000000,
+                        duration: 60
+                    }
+                ];
+                renderVideos();
+            }
+        }
+
+        function renderVideos() {
+            const feed = document.getElementById('videoFeed');
+            feed.innerHTML = '';
+            
+            videos.forEach((video, index) => {
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                videoContainer.id = `video-${video.id}`;
+                
+                videoContainer.innerHTML = `
+                    <div class="video-wrapper">
+                        <iframe src="${video.videoUrl}" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="video-overlay">
+                        <div class="video-user">
+                            <div class="user-avatar">
+                                <img src="${video.thumbnail}" alt="${video.username}">
+                            </div>
+                            <div class="user-info">
+                                <div class="username">@${video.username}</div>
+                                <div style="font-size:12px;color:#666;">${formatNumber(video.views)} просмотров</div>
+                            </div>
+                            <button class="follow-btn" onclick="followUser('${video.username}')">Подписаться</button>
+                        </div>
+                        <div class="video-caption">${video.caption}</div>
+                        <div class="sound-info">
+                            <i class="fas fa-music"></i>
+                            ${video.sound}
+                        </div>
+                        <div class="hashtags">
+                            ${video.hashtags ? video.hashtags.map(tag => `#${tag}`).join(' ') : '#тренд #видео'}
+                        </div>
+                    </div>
+                `;
+                
+                feed.appendChild(videoContainer);
+                
+                // Первое видео делаем текущим
+                if (index === 0) {
+                    currentVideo = video;
+                    updateVideoUI();
+                }
+            });
+            
+            setupVideoObserver();
+        }
+
+        function setupVideoObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const videoId = entry.target.id.replace('video-', '');
+                        const video = videos.find(v => v.id === videoId);
+                        if (video) {
+                            currentVideo = video;
+                            updateVideoUI();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('.video-container').forEach(container => {
+                observer.observe(container);
+            });
+        }
+
+        function updateVideoUI() {
+            if (!currentVideo) return;
+            
+            document.getElementById('likeCount').textContent = formatNumber(currentVideo.likes);
+            document.getElementById('commentCount').textContent = formatNumber(currentVideo.comments);
+            document.getElementById('shareCount').textContent = formatNumber(currentVideo.shares);
+        }
+
+        // ====================== ДЕЙСТВИЯ С ВИДЕО ======================
+        async function likeVideo() {
+            if (!currentUser || !currentVideo) {
+                showNotification('Сначала войдите в аккаунт');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/videos/${currentVideo.id}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('likeCount').textContent = formatNumber(data.likes);
+                    currentVideo.likes = data.likes;
+                    
+                    const likeIcon = document.getElementById('likeIcon');
+                    likeIcon.style.color = '#FF0050';
+                    likeIcon.style.animation = 'fadeIn 0.3s';
+                    
+                    showNotification('Видео понравилось!');
+                }
+            } catch (error) {
+                console.error('Ошибка лайка:', error);
+            }
+        }
+
+        function showComments() {
+            showNotification('Комментарии временно недоступны');
+        }
+
+        function shareVideo() {
+            if (navigator.share) {
+                navigator.share({
+                    title: `@${currentVideo.username} в TikTok`,
+                    text: currentVideo.caption,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showNotification('Ссылка скопирована!');
+            }
+        }
+
+        function saveVideo() {
+            showNotification('Видео сохранено');
+        }
+
+        function followUser(username) {
+            if (!currentUser) {
+                showNotification('Сначала войдите в аккаунт');
+                return;
+            }
+            showNotification(`Вы подписались на @${username}`);
+        }
+
+        // ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======================
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num;
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function showTerms() {
+            showNotification('Условия использования будут доступны позже');
+        }
+
+        function showSearch() {
+            showNotification('Поиск временно недоступен');
+        }
+
+        function showInbox() {
+            showNotification('Входящие временно недоступны');
+        }
+
+        function showUpload() {
+            showNotification('Загрузка видео временно недоступна');
+        }
+
+        function showProfile() {
+            if (!currentUser) {
+                showAuthScreen();
+                return;
+            }
+            showNotification('Профиль временно недоступен');
+        }
+
+        function showFeed() {
+            loadFeed();
+        }
+
+        // Глобальные функции
+        window.switchAuthTab = switchAuthTab;
+        window.register = register;
+        window.login = login;
+        window.likeVideo = likeVideo;
+        window.showComments = showComments;
+        window.shareVideo = shareVideo;
+        window.saveVideo = saveVideo;
+        window.followUser = followUser;
+        window.showTerms = showTerms;
+        window.showSearch = showSearch;
+        window.showInbox = showInbox;
+        window.showUpload = showUpload;
+        window.showProfile = showProfile;
+        window.showFeed = showFeed;
+    </script>
+</body>
+</html>
