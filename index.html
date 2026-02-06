@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TikTok - Регистрация и вход</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>TikTok - Видео для вас</title>
     <style>
-        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -36,7 +34,7 @@
             position: relative;
         }
 
-        /* ===== ЗАГРУЗЧИК ===== */
+        /* ЗАГРУЗЧИК */
         #loader {
             position: fixed;
             top: 0;
@@ -66,7 +64,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* ===== ШАПКА ===== */
+        /* ШАПКА */
         .header {
             position: fixed;
             top: 0;
@@ -96,148 +94,9 @@
             font-size: 20px;
         }
 
-        /* ===== ЭКРАН РЕГИСТРАЦИИ/ВХОДА ===== */
-        .auth-screen {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            background: linear-gradient(45deg, #000, #121212);
-        }
-
-        .auth-container {
-            width: 100%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 40px 30px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 2px solid transparent;
-        }
-
-        .auth-tab.active {
-            color: var(--tiktok-white);
-            border-bottom-color: var(--tiktok-red);
-        }
-
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.active {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--tiktok-red);
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .form-input.error {
-            border-color: #ff4757;
-        }
-
-        .error-message {
-            color: #ff4757;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        .auth-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-            margin-top: 10px;
-        }
-
-        .auth-btn:active {
-            transform: scale(0.98);
-        }
-
-        .auth-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .auth-link {
-            color: var(--tiktok-blue);
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* ===== ГЛАВНЫЙ ЭКРАН ===== */
-        .main-screen {
-            display: none;
-            height: 100vh;
-            flex-direction: column;
-        }
-
         /* ЛЕНТА ВИДЕО */
         .video-feed {
-            flex: 1;
+            height: 100vh;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
@@ -425,7 +284,294 @@
             box-shadow: 0 4px 25px rgba(255, 0, 80, 0.3);
         }
 
-        /* ===== УВЕДОМЛЕНИЯ ===== */
+        /* МОДАЛЬНЫЕ ОКНА */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .modal-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        /* КОММЕНТАРИИ */
+        .comments-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comments-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .comment-username {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .comment-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .comment-action {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+        }
+
+        .comment-input-container {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.8);
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* ФОРМЫ */
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 16px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--tiktok-red);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* ПРОФИЛЬ */
+        .profile-header {
+            padding: 20px 16px;
+            background: linear-gradient(180deg, #000 0%, transparent 100%);
+        }
+
+        .profile-info {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            overflow: hidden;
+            border: 3px solid white;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .profile-bio {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .profile-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .profile-btn.primary {
+            background: var(--tiktok-red);
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        }
+
+        .video-thumb {
+            aspect-ratio: 9/16;
+            background: #222;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ПОИСК */
+        .search-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 8px;
+            padding: 0 16px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .search-results {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .search-tab {
+            display: flex;
+            gap: 20px;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .search-tab-item {
+            padding: 12px 0;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .search-tab-item.active {
+            color: white;
+            border-bottom-color: var(--tiktok-red);
+        }
+
+        /* УВЕДОМЛЕНИЯ */
         .notification {
             position: fixed;
             top: 60px;
@@ -437,20 +583,7 @@
             border-radius: 24px;
             font-size: 14px;
             z-index: 2001;
-            animation: slideDown 0.3s ease-out;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        @keyframes slideDown {
-            from {
-                transform: translateX(-50%) translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
+            animation: fadeIn 0.3s ease-out;
         }
 
         @keyframes fadeIn {
@@ -458,15 +591,18 @@
             to { opacity: 1; }
         }
 
-        /* ===== АДАПТИВНОСТЬ ===== */
+        /* АДАПТИВНОСТЬ */
         @media (max-width: 768px) {
-            .auth-container {
-                padding: 30px 20px;
-            }
-            
             .header { height: 44px; }
             .bottom-nav { height: 48px; }
             .create-btn { bottom: 60px; }
+        }
+
+        @media (min-width: 768px) {
+            .video-container {
+                max-width: 414px;
+                margin: 0 auto;
+            }
         }
     </style>
 </head>
@@ -475,501 +611,351 @@
         <!-- ЗАГРУЗЧИК -->
         <div id="loader">
             <div class="loader-logo">TikTok</div>
-            <div style="color: #666; font-size: 14px; margin-top: 10px;">Загрузка...</div>
+            <div style="color: #666; font-size: 14px; margin-top: 10px;">Загрузка трендов...</div>
         </div>
 
-        <!-- ЭКРАН РЕГИСТРАЦИИ/ВХОДА -->
-        <div class="auth-screen" id="authScreen">
-            <div class="auth-container">
-                <div class="auth-tabs">
-                    <div class="auth-tab active" onclick="switchAuthTab('login')">Вход</div>
-                    <div class="auth-tab" onclick="switchAuthTab('register')">Регистрация</div>
+        <!-- ШАПКА -->
+        <div class="header">
+            <div class="logo">TikTok</div>
+            <div class="header-actions">
+                <i class="fas fa-search" onclick="showSearch()"></i>
+                <i class="fas fa-inbox" onclick="showInbox()"></i>
+            </div>
+        </div>
+
+        <!-- ЛЕНТА ВИДЕО -->
+        <div class="video-feed" id="videoFeed">
+            <!-- Видео загружаются динамически -->
+        </div>
+
+        <!-- ПРАВАЯ ПАНЕЛЬ -->
+        <div class="right-panel" id="rightPanel">
+            <div class="action-btn">
+                <div class="action-icon" onclick="likeVideo()">
+                    <i class="fas fa-heart" id="likeIcon"></i>
                 </div>
-                
-                <!-- ФОРМА ВХОДА -->
-                <div class="auth-form active" id="loginForm">
-                    <div class="form-group">
-                        <label class="form-label">Имя пользователя или Email</label>
-                        <input type="text" class="form-input" id="loginUsername" placeholder="Введите имя пользователя или email">
-                        <div class="error-message" id="loginUsernameError"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Пароль</label>
-                        <input type="password" class="form-input" id="loginPassword" placeholder="Введите пароль">
-                        <div class="error-message" id="loginPasswordError"></div>
-                    </div>
-                    
-                    <button class="auth-btn" onclick="login()" id="loginBtn">
-                        <span>Войти</span>
-                        <span style="display:none;" id="loginLoading">
-                            <i class="fas fa-spinner fa-spin"></i> Вход...
-                        </span>
-                    </button>
-                    
-                    <div class="auth-footer">
-                        <div style="margin-bottom: 10px;">Демо аккаунты:</div>
-                        <div style="font-size: 11px; color: #888; margin-bottom: 5px;">
-                            tiktok_trends / demo123
-                        </div>
-                        <div style="font-size: 11px; color: #888;">
-                            dance_queen / demo123
-                        </div>
-                    </div>
+                <div class="action-count" id="likeCount">0</div>
+            </div>
+            
+            <div class="action-btn">
+                <div class="action-icon" onclick="showComments()">
+                    <i class="fas fa-comment"></i>
                 </div>
-                
-                <!-- ФОРМА РЕГИСТРАЦИИ -->
-                <div class="auth-form" id="registerForm">
-                    <div class="form-group">
-                        <label class="form-label">Имя пользователя</label>
-                        <input type="text" class="form-input" id="registerUsername" placeholder="Придумайте имя пользователя">
-                        <div class="error-message" id="registerUsernameError"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" id="registerEmail" placeholder="Введите ваш email">
-                        <div class="error-message" id="registerEmailError"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Пароль</label>
-                        <input type="password" class="form-input" id="registerPassword" placeholder="Придумайте пароль (минимум 6 символов)">
-                        <div class="error-message" id="registerPasswordError"></div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Подтвердите пароль</label>
-                        <input type="password" class="form-input" id="registerConfirmPassword" placeholder="Повторите пароль">
-                        <div class="error-message" id="registerConfirmPasswordError"></div>
-                    </div>
-                    
-                    <button class="auth-btn" onclick="register()" id="registerBtn">
-                        <span>Зарегистрироваться</span>
-                        <span style="display:none;" id="registerLoading">
-                            <i class="fas fa-spinner fa-spin"></i> Регистрация...
-                        </span>
-                    </button>
-                    
-                    <div class="auth-footer">
-                        Регистрируясь, вы соглашаетесь с 
-                        <span class="auth-link" onclick="showTerms()">Условиями использования</span>
-                    </div>
+                <div class="action-count" id="commentCount">0</div>
+            </div>
+            
+            <div class="action-btn">
+                <div class="action-icon" onclick="shareVideo()">
+                    <i class="fas fa-share"></i>
+                </div>
+                <div class="action-count" id="shareCount">0</div>
+            </div>
+            
+            <div class="action-btn">
+                <div class="action-icon" onclick="saveVideo()">
+                    <i class="fas fa-bookmark"></i>
                 </div>
             </div>
         </div>
 
-        <!-- ГЛАВНЫЙ ЭКРАН -->
-        <div class="main-screen" id="mainScreen">
-            <!-- ШАПКА -->
-            <div class="header">
-                <div class="logo">TikTok</div>
-                <div class="header-actions">
-                    <i class="fas fa-search" onclick="showSearch()"></i>
-                    <i class="fas fa-inbox" onclick="showInbox()"></i>
-                    <div class="user-avatar" id="headerAvatar" onclick="showProfile()" style="width:30px;height:30px;cursor:pointer;"></div>
-                </div>
+        <!-- НИЖНЕЕ МЕНЮ -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showFeed()">
+                <i class="fas fa-home"></i>
+                <div class="nav-text">Главная</div>
             </div>
-
-            <!-- ЛЕНТА ВИДЕО -->
-            <div class="video-feed" id="videoFeed">
-                <!-- Видео загружаются динамически -->
+            <div class="nav-item" onclick="showSearch()">
+                <i class="fas fa-search"></i>
+                <div class="nav-text">Поиск</div>
             </div>
+            <div class="create-btn" onclick="showUpload()">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="nav-item" onclick="showInbox()">
+                <i class="fas fa-inbox"></i>
+                <div class="nav-text">Входящие</div>
+            </div>
+            <div class="nav-item" onclick="showProfile()">
+                <i class="fas fa-user"></i>
+                <div class="nav-text">Я</div>
+            </div>
+        </div>
 
-            <!-- ПРАВАЯ ПАНЕЛЬ -->
-            <div class="right-panel">
-                <div class="action-btn">
-                    <div class="action-icon" onclick="likeVideo()">
-                        <i class="fas fa-heart" id="likeIcon"></i>
-                    </div>
-                    <div class="action-count" id="likeCount">0</div>
-                </div>
-                
-                <div class="action-btn">
-                    <div class="action-icon" onclick="showComments()">
-                        <i class="fas fa-comment"></i>
-                    </div>
-                    <div class="action-count" id="commentCount">0</div>
-                </div>
-                
-                <div class="action-btn">
-                    <div class="action-icon" onclick="shareVideo()">
-                        <i class="fas fa-share"></i>
-                    </div>
-                    <div class="action-count" id="shareCount">0</div>
-                </div>
-                
-                <div class="action-btn">
-                    <div class="action-icon" onclick="saveVideo()">
-                        <i class="fas fa-bookmark"></i>
+        <!-- МОДАЛКА РЕГИСТРАЦИИ -->
+        <div class="modal" id="registerModal">
+            <div class="modal-content" style="display:flex;align-items:center;justify-content:center;">
+                <div style="width:100%;max-width:400px;padding:32px;">
+                    <h2 style="text-align:center;margin-bottom:32px;">Регистрация</h2>
+                    <input type="text" class="form-input" placeholder="Имя пользователя" id="registerUsername">
+                    <input type="email" class="form-input" placeholder="Email" id="registerEmail">
+                    <input type="password" class="form-input" placeholder="Пароль" id="registerPassword">
+                    <button class="btn-primary" onclick="register()">Зарегистрироваться</button>
+                    <div style="text-align:center;margin-top:20px;color:#666;">
+                        Уже есть аккаунт? <span style="color:var(--tiktok-blue);cursor:pointer;" onclick="showLogin()">Войти</span>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- НИЖНЕЕ МЕНЮ -->
-            <div class="bottom-nav">
-                <div class="nav-item active" onclick="showFeed()">
-                    <i class="fas fa-home"></i>
-                    <div class="nav-text">Главная</div>
+        <!-- МОДАЛКА ВХОДА -->
+        <div class="modal" id="loginModal">
+            <div class="modal-content" style="display:flex;align-items:center;justify-content:center;">
+                <div style="width:100%;max-width:400px;padding:32px;">
+                    <h2 style="text-align:center;margin-bottom:32px;">Вход в TikTok</h2>
+                    <input type="text" class="form-input" placeholder="Имя пользователя или Email" id="loginUsername">
+                    <input type="password" class="form-input" placeholder="Пароль" id="loginPassword">
+                    <button class="btn-primary" onclick="login()">Войти</button>
+                    <div style="text-align:center;margin-top:20px;color:#666;">
+                        Нет аккаунта? <span style="color:var(--tiktok-blue);cursor:pointer;" onclick="showRegister()">Зарегистрироваться</span>
+                    </div>
                 </div>
-                <div class="nav-item" onclick="showSearch()">
-                    <i class="fas fa-search"></i>
-                    <div class="nav-text">Поиск</div>
+            </div>
+        </div>
+
+        <!-- МОДАЛКА КОММЕНТАРИЕВ -->
+        <div class="modal" id="commentsModal">
+            <div class="comments-container">
+                <div class="modal-header">
+                    <div class="modal-title">Комментарии</div>
+                    <i class="fas fa-times" onclick="hideComments()"></i>
                 </div>
-                <div class="create-btn" onclick="showUpload()">
-                    <i class="fas fa-plus"></i>
+                <div class="comments-list" id="commentsList">
+                    <!-- Комментарии загружаются динамически -->
                 </div>
-                <div class="nav-item" onclick="showInbox()">
-                    <i class="fas fa-inbox"></i>
-                    <div class="nav-text">Входящие</div>
+                <div class="comment-input-container">
+                    <input type="text" class="comment-input" placeholder="Добавьте комментарий..." id="commentInput" onkeypress="handleCommentKeypress(event)">
                 </div>
-                <div class="nav-item" onclick="showProfile()">
-                    <i class="fas fa-user"></i>
-                    <div class="nav-text">Я</div>
+            </div>
+        </div>
+
+        <!-- МОДАЛКА ПРОФИЛЯ -->
+        <div class="modal" id="profileModal">
+            <div class="modal-header">
+                <i class="fas fa-arrow-left" onclick="hideProfile()"></i>
+                <div class="modal-title">Профиль</div>
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+            <div class="modal-content">
+                <div class="profile-header">
+                    <div class="profile-info">
+                        <div class="profile-avatar" id="profileAvatar"></div>
+                        <div style="flex:1;">
+                            <h2 id="profileUsername">@username</h2>
+                            <div id="profileBio">Биография</div>
+                            <button class="follow-btn" id="profileFollowBtn" onclick="toggleFollow()">Подписаться</button>
+                        </div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="profileVideos">0</div>
+                            <div class="stat-label">Видео</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="profileFollowers">0</div>
+                            <div class="stat-label">Подписчики</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="profileFollowing">0</div>
+                            <div class="stat-label">Подписки</div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="profile-btn">Редактировать</button>
+                        <button class="profile-btn primary" onclick="shareProfile()">Поделиться</button>
+                    </div>
                 </div>
+                <div class="videos-grid" id="profileVideosGrid">
+                    <!-- Видео пользователя -->
+                </div>
+            </div>
+        </div>
+
+        <!-- МОДАЛКА ПОИСКА -->
+        <div class="modal" id="searchModal">
+            <div class="search-header">
+                <i class="fas fa-arrow-left" onclick="hideSearch()"></i>
+                <input type="text" class="search-input" placeholder="Поиск видео и пользователей" id="searchInput" oninput="searchVideos(this.value)">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="search-tab">
+                <div class="search-tab-item active" onclick="switchSearchTab('videos')">Видео</div>
+                <div class="search-tab-item" onclick="switchSearchTab('users')">Пользователи</div>
+                <div class="search-tab-item" onclick="switchSearchTab('hashtags')">Хештеги</div>
+            </div>
+            <div class="search-results" id="searchResults">
+                <!-- Результаты поиска -->
             </div>
         </div>
     </div>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-        // ====================== КОНФИГУРАЦИЯ ======================
+        // ==================== КОНФИГУРАЦИЯ ====================
         const API_URL = 'http://localhost:3000/api';
         let currentUser = null;
         let currentVideo = null;
         let videos = [];
-        let token = localStorage.getItem('tiktok_token');
+        let token = localStorage.getItem('token');
+        let currentVideoIndex = 0;
 
-        // ====================== ИНИЦИАЛИЗАЦИЯ ======================
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
         document.addEventListener('DOMContentLoaded', async () => {
-            // Скрываем загрузчик через 1 секунду
-            setTimeout(() => {
-                document.getElementById('loader').style.display = 'none';
-            }, 1000);
-            
-            // Проверяем авторизацию
             await checkAuth();
+            setupEventListeners();
         });
 
-        // ====================== АВТОРИЗАЦИЯ ======================
+        // ==================== АВТОРИЗАЦИЯ ====================
         async function checkAuth() {
-            if (!token) {
-                showAuthScreen();
+            if (token) {
+                try {
+                    // Проверяем токен
+                    const response = await fetch(`${API_URL}/verify`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        currentUser = JSON.parse(localStorage.getItem('user'));
+                        document.getElementById('loader').style.display = 'none';
+                        loadFeed();
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Ошибка проверки токена:', error);
+                }
+            }
+            
+            // Если нет токена или он невалидный
+            showLogin();
+        }
+
+        async function register() {
+            const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!username || !email || !password) {
+                showNotification('Заполните все поля');
                 return;
             }
             
             try {
-                const response = await fetch(`${API_URL}/auth/verify`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    currentUser = data.user;
-                    showMainScreen();
-                    loadFeed();
-                } else {
-                    localStorage.removeItem('tiktok_token');
-                    localStorage.removeItem('tiktok_user');
-                    showAuthScreen();
-                }
-            } catch (error) {
-                console.log('Ошибка проверки токена:', error);
-                localStorage.removeItem('tiktok_token');
-                localStorage.removeItem('tiktok_user');
-                showAuthScreen();
-            }
-        }
-
-        function showAuthScreen() {
-            document.getElementById('authScreen').style.display = 'flex';
-            document.getElementById('mainScreen').style.display = 'none';
-        }
-
-        function showMainScreen() {
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('mainScreen').style.display = 'flex';
-            
-            // Устанавливаем аватар в шапке
-            if (currentUser && currentUser.profilePic) {
-                document.getElementById('headerAvatar').innerHTML = 
-                    `<img src="${currentUser.profilePic}" alt="${currentUser.username}">`;
-            }
-        }
-
-        // ====================== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ======================
-        function switchAuthTab(tab) {
-            // Переключаем вкладки
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            
-            if (tab === 'login') {
-                document.querySelectorAll('.auth-tab')[0].classList.add('active');
-                document.getElementById('loginForm').classList.add('active');
-            } else {
-                document.querySelectorAll('.auth-tab')[1].classList.add('active');
-                document.getElementById('registerForm').classList.add('active');
-            }
-            
-            // Очищаем ошибки
-            clearErrors();
-        }
-
-        // ====================== ВАЛИДАЦИЯ ======================
-        function clearErrors() {
-            document.querySelectorAll('.error-message').forEach(el => {
-                el.classList.remove('show');
-                el.textContent = '';
-            });
-            document.querySelectorAll('.form-input').forEach(el => {
-                el.classList.remove('error');
-            });
-        }
-
-        function showError(inputId, message) {
-            const input = document.getElementById(inputId);
-            const errorEl = document.getElementById(inputId + 'Error');
-            
-            if (input && errorEl) {
-                input.classList.add('error');
-                errorEl.textContent = message;
-                errorEl.classList.add('show');
-            }
-        }
-
-        function validateLoginForm() {
-            clearErrors();
-            let isValid = true;
-            
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            
-            if (!username) {
-                showError('loginUsername', 'Введите имя пользователя или email');
-                isValid = false;
-            }
-            
-            if (!password) {
-                showError('loginPassword', 'Введите пароль');
-                isValid = false;
-            } else if (password.length < 6) {
-                showError('loginPassword', 'Пароль должен быть не менее 6 символов');
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-
-        function validateRegisterForm() {
-            clearErrors();
-            let isValid = true;
-            
-            const username = document.getElementById('registerUsername').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value.trim();
-            const confirmPassword = document.getElementById('registerConfirmPassword').value.trim();
-            
-            // Валидация имени пользователя
-            if (!username) {
-                showError('registerUsername', 'Введите имя пользователя');
-                isValid = false;
-            } else if (username.length < 3) {
-                showError('registerUsername', 'Имя пользователя должно быть не менее 3 символов');
-                isValid = false;
-            } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-                showError('registerUsername', 'Имя пользователя может содержать только буквы, цифры и _');
-                isValid = false;
-            }
-            
-            // Валидация email
-            if (!email) {
-                showError('registerEmail', 'Введите email');
-                isValid = false;
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showError('registerEmail', 'Введите корректный email');
-                isValid = false;
-            }
-            
-            // Валидация пароля
-            if (!password) {
-                showError('registerPassword', 'Введите пароль');
-                isValid = false;
-            } else if (password.length < 6) {
-                showError('registerPassword', 'Пароль должен быть не менее 6 символов');
-                isValid = false;
-            }
-            
-            // Подтверждение пароля
-            if (!confirmPassword) {
-                showError('registerConfirmPassword', 'Подтвердите пароль');
-                isValid = false;
-            } else if (password !== confirmPassword) {
-                showError('registerConfirmPassword', 'Пароли не совпадают');
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-
-        // ====================== РЕГИСТРАЦИЯ ======================
-        async function register() {
-            if (!validateRegisterForm()) return;
-            
-            const btn = document.getElementById('registerBtn');
-            const text = btn.querySelector('span:first-child');
-            const loading = document.getElementById('registerLoading');
-            
-            // Показываем индикатор загрузки
-            text.style.display = 'none';
-            loading.style.display = 'inline';
-            btn.disabled = true;
-            
-            try {
-                const response = await fetch(`${API_URL}/auth/register`, {
+                const response = await fetch(`${API_URL}/register`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: document.getElementById('registerUsername').value.trim(),
-                        email: document.getElementById('registerEmail').value.trim(),
-                        password: document.getElementById('registerPassword').value.trim()
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
                 });
                 
                 const data = await response.json();
                 
-                if (response.ok) {
-                    // Сохраняем токен и пользователя
+                if (data.success) {
                     token = data.token;
                     currentUser = data.user;
                     
-                    localStorage.setItem('tiktok_token', token);
-                    localStorage.setItem('tiktok_user', JSON.stringify(currentUser));
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
                     
-                    showNotification('Регистрация успешна! Добро пожаловать в TikTok!');
+                    document.getElementById('registerModal').style.display = 'none';
+                    document.getElementById('loader').style.display = 'none';
                     
-                    // Переключаемся на главный экран
-                    setTimeout(() => {
-                        showMainScreen();
-                        loadFeed();
-                    }, 1000);
-                    
+                    loadFeed();
+                    showNotification('Регистрация успешна!');
                 } else {
-                    // Показываем ошибку с сервера
-                    if (data.details) {
-                        showError('registerUsername', data.details);
-                    } else {
-                        showError('registerUsername', data.error || 'Ошибка регистрации');
-                    }
-                    
                     showNotification(data.error || 'Ошибка регистрации');
                 }
-                
             } catch (error) {
                 console.error('Ошибка регистрации:', error);
-                showError('registerUsername', 'Ошибка соединения с сервером');
-                showNotification('Ошибка соединения с сервером');
-            } finally {
-                // Возвращаем кнопку в исходное состояние
-                text.style.display = 'inline';
-                loading.style.display = 'none';
-                btn.disabled = false;
+                showNotification('Ошибка регистрации');
             }
         }
 
-        // ====================== ВХОД ======================
         async function login() {
-            if (!validateLoginForm()) return;
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
             
-            const btn = document.getElementById('loginBtn');
-            const text = btn.querySelector('span:first-child');
-            const loading = document.getElementById('loginLoading');
-            
-            // Показываем индикатор загрузки
-            text.style.display = 'none';
-            loading.style.display = 'inline';
-            btn.disabled = true;
+            if (!username || !password) {
+                showNotification('Заполните все поля');
+                return;
+            }
             
             try {
-                const response = await fetch(`${API_URL}/auth/login`, {
+                const response = await fetch(`${API_URL}/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: document.getElementById('loginUsername').value.trim(),
-                        password: document.getElementById('loginPassword').value.trim()
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
                 });
                 
                 const data = await response.json();
                 
-                if (response.ok) {
-                    // Сохраняем токен и пользователя
+                if (data.success) {
                     token = data.token;
                     currentUser = data.user;
                     
-                    localStorage.setItem('tiktok_token', token);
-                    localStorage.setItem('tiktok_user', JSON.stringify(currentUser));
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
                     
-                    showNotification('Вход выполнен успешно!');
+                    document.getElementById('loginModal').style.display = 'none';
+                    document.getElementById('loader').style.display = 'none';
                     
-                    // Переключаемся на главный экран
-                    setTimeout(() => {
-                        showMainScreen();
-                        loadFeed();
-                    }, 500);
-                    
+                    loadFeed();
+                    showNotification('Вход успешен!');
                 } else {
-                    // Показываем ошибку с сервера
-                    if (data.details) {
-                        showError('loginUsername', data.details);
-                    } else {
-                        showError('loginUsername', data.error || 'Ошибка входа');
-                    }
-                    
                     showNotification(data.error || 'Ошибка входа');
                 }
-                
             } catch (error) {
                 console.error('Ошибка входа:', error);
-                showError('loginUsername', 'Ошибка соединения с сервером');
-                showNotification('Ошибка соединения с сервером');
-            } finally {
-                // Возвращаем кнопку в исходное состояние
-                text.style.display = 'inline';
-                loading.style.display = 'none';
-                btn.disabled = false;
+                showNotification('Ошибка входа');
             }
         }
 
-        // ====================== ЛЕНТА ВИДЕО ======================
+        function showRegister() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('registerModal').style.display = 'flex';
+        }
+
+        function showLogin() {
+            document.getElementById('registerModal').style.display = 'none';
+            document.getElementById('loginModal').style.display = 'flex';
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            currentUser = null;
+            token = null;
+            showLogin();
+        }
+
+        // ==================== ЛЕНТА ВИДЕО ====================
         async function loadFeed() {
             try {
-                const response = await fetch(`${API_URL}/videos/feed`);
-                videos = await response.json();
-                renderVideos();
+                const response = await fetch(`${API_URL}/videos/feed?userId=${currentUser?.id || ''}&limit=20`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    videos = data.videos;
+                    renderVideos();
+                }
             } catch (error) {
                 console.error('Ошибка загрузки ленты:', error);
-                // Используем демо видео при ошибке
-                videos = [
-                    {
-                        id: 'video1',
-                        username: 'tiktok_trends',
-                        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1',
-                        thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg',
-                        caption: 'Тренд 2024! Все танцуют этот танец 🎵 #танец #тренд2024',
-                        sound: 'Оригинальный звук',
-                        likes: 1250000,
-                        comments: 23400,
-                        shares: 89000,
-                        views: 5000000,
-                        duration: 60
-                    }
-                ];
-                renderVideos();
+            }
+        }
+
+        async function loadTrending() {
+            try {
+                const response = await fetch(`${API_URL}/videos/trending`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    videos = data.videos;
+                    renderVideos();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки трендов:', error);
             }
         }
 
@@ -993,13 +979,13 @@
                     <div class="video-overlay">
                         <div class="video-user">
                             <div class="user-avatar">
-                                <img src="${video.thumbnail}" alt="${video.username}">
+                                <img src="${video.user?.profilePic || 'https://i.pravatar.cc/150'}" alt="">
                             </div>
                             <div class="user-info">
                                 <div class="username">@${video.username}</div>
-                                <div style="font-size:12px;color:#666;">${formatNumber(video.views)} просмотров</div>
+                                <div style="font-size:12px;color:#666;">${formatNumber(video.likes?.length || 0)} лайков</div>
                             </div>
-                            <button class="follow-btn" onclick="followUser('${video.username}')">Подписаться</button>
+                            <button class="follow-btn" onclick="followUser('${video.userId}')">Подписаться</button>
                         </div>
                         <div class="video-caption">${video.caption}</div>
                         <div class="sound-info">
@@ -1007,14 +993,13 @@
                             ${video.sound}
                         </div>
                         <div class="hashtags">
-                            ${video.hashtags ? video.hashtags.map(tag => `#${tag}`).join(' ') : '#тренд #видео'}
+                            ${(video.hashtags || []).map(tag => `#${tag}`).join(' ')}
                         </div>
                     </div>
                 `;
                 
                 feed.appendChild(videoContainer);
                 
-                // Первое видео делаем текущим
                 if (index === 0) {
                     currentVideo = video;
                     updateVideoUI();
@@ -1046,77 +1031,448 @@
         function updateVideoUI() {
             if (!currentVideo) return;
             
-            document.getElementById('likeCount').textContent = formatNumber(currentVideo.likes);
-            document.getElementById('commentCount').textContent = formatNumber(currentVideo.comments);
-            document.getElementById('shareCount').textContent = formatNumber(currentVideo.shares);
+            document.getElementById('likeCount').textContent = formatNumber(currentVideo.likes?.length || 0);
+            document.getElementById('commentCount').textContent = formatNumber(currentVideo.comments?.length || 0);
+            document.getElementById('shareCount').textContent = formatNumber(currentVideo.shares || 0);
+            
+            const likeIcon = document.getElementById('likeIcon');
+            if (currentVideo.likes?.includes(currentUser?.id)) {
+                likeIcon.style.color = '#FF0050';
+            } else {
+                likeIcon.style.color = 'white';
+            }
         }
 
-        // ====================== ДЕЙСТВИЯ С ВИДЕО ======================
+        // ==================== ДЕЙСТВИЯ С ВИДЕО ====================
         async function likeVideo() {
-            if (!currentUser || !currentVideo) {
-                showNotification('Сначала войдите в аккаунт');
+            if (!currentUser) {
+                showLogin();
                 return;
             }
+            
+            if (!currentVideo) return;
             
             try {
                 const response = await fetch(`${API_URL}/videos/${currentVideo.id}/like`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: currentUser.id })
                 });
                 
                 const data = await response.json();
                 
-                if (response.ok) {
+                if (data.success) {
                     document.getElementById('likeCount').textContent = formatNumber(data.likes);
-                    currentVideo.likes = data.likes;
                     
                     const likeIcon = document.getElementById('likeIcon');
-                    likeIcon.style.color = '#FF0050';
-                    likeIcon.style.animation = 'fadeIn 0.3s';
+                    if (data.hasLiked) {
+                        likeIcon.style.color = '#FF0050';
+                        likeIcon.style.animation = 'fadeIn 0.3s';
+                        setTimeout(() => likeIcon.style.animation = '', 300);
+                        
+                        // Анимация сердца
+                        const heart = document.createElement('div');
+                        heart.innerHTML = '<i class="fas fa-heart" style="font-size:80px;color:#FF0050;"></i>';
+                        heart.style.position = 'fixed';
+                        heart.style.left = '50%';
+                        heart.style.top = '50%';
+                        heart.style.transform = 'translate(-50%, -50%)';
+                        heart.style.pointerEvents = 'none';
+                        heart.style.zIndex = '10000';
+                        heart.style.animation = 'fadeIn 0.8s ease-out forwards';
+                        document.body.appendChild(heart);
+                        
+                        setTimeout(() => heart.remove(), 800);
+                    } else {
+                        likeIcon.style.color = 'white';
+                    }
                     
-                    showNotification('Видео понравилось!');
+                    // Обновляем локальные данные
+                    currentVideo.likes = data.likes;
                 }
             } catch (error) {
                 console.error('Ошибка лайка:', error);
             }
         }
 
-        function showComments() {
-            showNotification('Комментарии временно недоступны');
+        async function showComments() {
+            if (!currentVideo) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/videos/${currentVideo.id}/comments`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const commentsList = document.getElementById('commentsList');
+                    commentsList.innerHTML = '';
+                    
+                    data.comments.forEach(comment => {
+                        const commentElement = document.createElement('div');
+                        commentElement.className = 'comment-item';
+                        commentElement.innerHTML = `
+                            <div class="comment-avatar">${comment.username.charAt(0)}</div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <div class="comment-username">@${comment.username}</div>
+                                    <div class="comment-time">${formatTime(comment.createdAt)}</div>
+                                </div>
+                                <div class="comment-text">${comment.text}</div>
+                                <div class="comment-actions">
+                                    <div class="comment-action" onclick="likeComment('${comment.id}')">
+                                        <i class="fas fa-heart"></i>
+                                        <span>${formatNumber(comment.likes)}</span>
+                                    </div>
+                                    <div class="comment-action" onclick="replyToComment('${comment.username}')">
+                                        Ответить
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        commentsList.appendChild(commentElement);
+                    });
+                    
+                    document.getElementById('commentsModal').style.display = 'flex';
+                    document.getElementById('commentInput').focus();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки комментариев:', error);
+            }
         }
 
-        function shareVideo() {
-            if (navigator.share) {
-                navigator.share({
-                    title: `@${currentVideo.username} в TikTok`,
-                    text: currentVideo.caption,
-                    url: window.location.href
+        function hideComments() {
+            document.getElementById('commentsModal').style.display = 'none';
+        }
+
+        async function addComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            
+            if (!text || !currentUser || !currentVideo) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/videos/${currentVideo.id}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        userId: currentUser.id,
+                        text 
+                    })
                 });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                showNotification('Ссылка скопирована!');
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    input.value = '';
+                    showComments(); // Перезагружаем комментарии
+                    document.getElementById('commentCount').textContent = 
+                        formatNumber(parseInt(document.getElementById('commentCount').textContent) + 1);
+                }
+            } catch (error) {
+                console.error('Ошибка добавления комментария:', error);
+            }
+        }
+
+        function handleCommentKeypress(event) {
+            if (event.key === 'Enter') {
+                addComment();
+            }
+        }
+
+        async function likeComment(commentId) {
+            try {
+                const response = await fetch(`${API_URL}/comments/${commentId}/like`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showComments(); // Перезагружаем комментарии
+                }
+            } catch (error) {
+                console.error('Ошибка лайка комментария:', error);
+            }
+        }
+
+        function replyToComment(username) {
+            const input = document.getElementById('commentInput');
+            input.value = `@${username} `;
+            input.focus();
+        }
+
+        async function shareVideo() {
+            if (!currentVideo) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/videos/${currentVideo.id}/share`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: currentUser?.id })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('shareCount').textContent = formatNumber(data.shares || 0);
+                    currentVideo.shares = data.shares;
+                    
+                    if (navigator.share) {
+                        navigator.share({
+                            title: `@${currentVideo.username} в TikTok`,
+                            text: currentVideo.caption,
+                            url: window.location.href + '?video=' + currentVideo.id
+                        });
+                    } else {
+                        navigator.clipboard.writeText(window.location.href + '?video=' + currentVideo.id);
+                        showNotification('Ссылка скопирована!');
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка шаринга:', error);
             }
         }
 
         function saveVideo() {
-            showNotification('Видео сохранено');
+            showNotification('Видео сохранено в избранное');
         }
 
-        function followUser(username) {
+        // ==================== ПОДПИСКИ ====================
+        async function followUser(userId) {
             if (!currentUser) {
-                showNotification('Сначала войдите в аккаунт');
+                showLogin();
                 return;
             }
-            showNotification(`Вы подписались на @${username}`);
+            
+            try {
+                const response = await fetch(`${API_URL}/follow/${userId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ followerId: currentUser.id })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const buttons = document.querySelectorAll(`[onclick*="${userId}"]`);
+                    buttons.forEach(button => {
+                        if (data.isFollowing) {
+                            button.textContent = 'Отписаться';
+                            button.style.background = '#333';
+                        } else {
+                            button.textContent = 'Подписаться';
+                            button.style.background = 'var(--tiktok-red)';
+                        }
+                    });
+                    
+                    showNotification(data.isFollowing ? 'Вы подписались' : 'Вы отписались');
+                }
+            } catch (error) {
+                console.error('Ошибка подписки:', error);
+            }
         }
 
-        // ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======================
+        async function toggleFollow() {
+            // Для профиля
+            const profileUserId = document.getElementById('profileModal').dataset.userId;
+            if (profileUserId) {
+                await followUser(profileUserId);
+            }
+        }
+
+        // ==================== ПРОФИЛЬ ====================
+        async function showProfile(username = currentUser?.username) {
+            try {
+                const response = await fetch(`${API_URL}/profile/${username}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const profileModal = document.getElementById('profileModal');
+                    profileModal.dataset.userId = data.user.id;
+                    
+                    document.getElementById('profileUsername').textContent = `@${data.user.username}`;
+                    document.getElementById('profileAvatar').innerHTML = 
+                        `<img src="${data.user.profilePic}" alt="${data.user.username}">`;
+                    document.getElementById('profileBio').textContent = data.user.bio || 'Нет биографии';
+                    document.getElementById('profileVideos').textContent = formatNumber(data.videos.length);
+                    document.getElementById('profileFollowers').textContent = formatNumber(data.user.followers);
+                    document.getElementById('profileFollowing').textContent = formatNumber(data.user.following);
+                    
+                    // Проверяем подписку
+                    const followBtn = document.getElementById('profileFollowBtn');
+                    const isCurrentUser = currentUser && currentUser.id === data.user.id;
+                    
+                    if (isCurrentUser) {
+                        followBtn.textContent = 'Редактировать профиль';
+                        followBtn.style.background = 'var(--tiktok-blue)';
+                    } else {
+                        const isFollowing = data.user.followers.includes(currentUser?.id);
+                        if (isFollowing) {
+                            followBtn.textContent = 'Отписаться';
+                            followBtn.style.background = '#333';
+                        } else {
+                            followBtn.textContent = 'Подписаться';
+                            followBtn.style.background = 'var(--tiktok-red)';
+                        }
+                    }
+                    
+                    // Отображаем видео
+                    const videosGrid = document.getElementById('profileVideosGrid');
+                    videosGrid.innerHTML = '';
+                    
+                    data.videos.forEach(video => {
+                        const videoElement = document.createElement('div');
+                        videoElement.className = 'video-thumb';
+                        videoElement.innerHTML = `
+                            <img src="${video.thumbnail}" alt="${video.caption}" 
+                                 onclick="playVideoFromProfile('${video.id}')">
+                            <div style="position:absolute;bottom:8px;left:8px;right:8px;display:flex;gap:12px;font-size:12px;color:white;">
+                                <span><i class="fas fa-play"></i> ${formatNumber(video.views)}</span>
+                                <span><i class="fas fa-heart"></i> ${formatNumber(video.likes.length)}</span>
+                            </div>
+                        `;
+                        videosGrid.appendChild(videoElement);
+                    });
+                    
+                    profileModal.style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки профиля:', error);
+            }
+        }
+
+        function hideProfile() {
+            document.getElementById('profileModal').style.display = 'none';
+        }
+
+        function shareProfile() {
+            const username = document.getElementById('profileUsername').textContent;
+            navigator.clipboard.writeText(`Посмотрите профиль ${username} в TikTok`);
+            showNotification('Ссылка скопирована!');
+        }
+
+        function playVideoFromProfile(videoId) {
+            const video = videos.find(v => v.id === videoId);
+            if (video) {
+                currentVideo = video;
+                updateVideoUI();
+                
+                // Прокручиваем к видео
+                const videoElement = document.getElementById(`video-${videoId}`);
+                if (videoElement) {
+                    videoElement.scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                hideProfile();
+            }
+        }
+
+        // ==================== ПОИСК ====================
+        async function showSearch() {
+            document.getElementById('searchModal').style.display = 'flex';
+            document.getElementById('searchInput').focus();
+        }
+
+        function hideSearch() {
+            document.getElementById('searchModal').style.display = 'none';
+        }
+
+        async function searchVideos(query) {
+            if (!query.trim()) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/videos/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const searchResults = document.getElementById('searchResults');
+                    searchResults.innerHTML = '';
+                    
+                    data.videos.forEach(video => {
+                        const videoElement = document.createElement('div');
+                        videoElement.className = 'search-result';
+                        videoElement.innerHTML = `
+                            <div style="display:flex;gap:12px;padding:12px;background:rgba(255,255,255,0.05);border-radius:8px;">
+                                <img src="${video.thumbnail}" style="width:80px;height:120px;border-radius:8px;object-fit:cover;">
+                                <div style="flex:1;">
+                                    <div style="font-weight:bold;margin-bottom:4px;">@${video.username}</div>
+                                    <div style="font-size:14px;margin-bottom:8px;">${video.caption.substring(0, 50)}...</div>
+                                    <div style="display:flex;gap:12px;font-size:12px;color:#666;">
+                                        <span><i class="fas fa-heart"></i> ${formatNumber(video.likes.length)}</span>
+                                        <span><i class="fas fa-comment"></i> ${formatNumber(video.comments.length)}</span>
+                                        <span><i class="fas fa-share"></i> ${formatNumber(video.shares)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        videoElement.onclick = () => playVideoFromProfile(video.id);
+                        searchResults.appendChild(videoElement);
+                    });
+                }
+            } catch (error) {
+                console.error('Ошибка поиска:', error);
+            }
+        }
+
+        function switchSearchTab(tab) {
+            document.querySelectorAll('.search-tab-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // В реальном приложении здесь была бы загрузка разных типов результатов
+        }
+
+        // ==================== НАВИГАЦИЯ ====================
+        function showFeed() {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.nav-item')[0].classList.add('active');
+            loadFeed();
+        }
+
+        function showInbox() {
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
+            
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.nav-item')[3].classList.add('active');
+            showNotification('Входящие сообщения');
+        }
+
+        function showUpload() {
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
+            
+            showNotification('Загрузка видео временно недоступна');
+        }
+
+        // ==================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ====================
         function formatNumber(num) {
             if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
             if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
             return num;
+        }
+
+        function formatTime(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            if (diff < 60000) return 'только что';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)} мин назад`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)} ч назад`;
+            if (diff < 604800000) return `${Math.floor(diff / 86400000)} д назад`;
+            
+            const date = new Date(timestamp);
+            return date.toLocaleDateString();
         }
 
         function showNotification(message) {
@@ -1128,52 +1484,104 @@
             setTimeout(() => {
                 notification.style.opacity = '0';
                 setTimeout(() => notification.remove(), 300);
-            }, 3000);
+            }, 2000);
         }
 
-        function showTerms() {
-            showNotification('Условия использования будут доступны позже');
-        }
-
-        function showSearch() {
-            showNotification('Поиск временно недоступен');
-        }
-
-        function showInbox() {
-            showNotification('Входящие временно недоступны');
-        }
-
-        function showUpload() {
-            showNotification('Загрузка видео временно недоступна');
-        }
-
-        function showProfile() {
-            if (!currentUser) {
-                showAuthScreen();
-                return;
-            }
-            showNotification('Профиль временно недоступен');
-        }
-
-        function showFeed() {
-            loadFeed();
+        function setupEventListeners() {
+            // Дабл-тап для лайка
+            const feed = document.getElementById('videoFeed');
+            let lastTap = 0;
+            
+            feed.addEventListener('touchstart', (e) => {
+                const currentTime = Date.now();
+                const tapLength = currentTime - lastTap;
+                
+                if (tapLength < 300 && tapLength > 0) {
+                    likeVideo();
+                    
+                    // Анимация сердца
+                    const heart = document.createElement('div');
+                    heart.innerHTML = '<i class="fas fa-heart" style="font-size:80px;color:#FF0050;"></i>';
+                    heart.style.position = 'fixed';
+                    heart.style.left = (e.touches[0].clientX - 40) + 'px';
+                    heart.style.top = (e.touches[0].clientY - 40) + 'px';
+                    heart.style.pointerEvents = 'none';
+                    heart.style.zIndex = '10000';
+                    heart.style.animation = 'fadeIn 0.8s ease-out forwards';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => heart.remove(), 800);
+                }
+                
+                lastTap = currentTime;
+            });
+            
+            // Свайпы для навигации
+            let startY = 0;
+            
+            feed.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            });
+            
+            feed.addEventListener('touchend', (e) => {
+                const endY = e.changedTouches[0].clientY;
+                const diffY = startY - endY;
+                
+                if (Math.abs(diffY) > 50) {
+                    if (diffY > 0) {
+                        // Свайп вверх - следующее видео
+                        const nextIndex = (videos.findIndex(v => v.id === currentVideo?.id) + 1) % videos.length;
+                        const nextVideo = videos[nextIndex];
+                        if (nextVideo) {
+                            const videoElement = document.getElementById(`video-${nextVideo.id}`);
+                            if (videoElement) {
+                                videoElement.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Поиск при вводе
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchVideos(e.target.value);
+                }, 500);
+            });
         }
 
         // Глобальные функции
-        window.switchAuthTab = switchAuthTab;
-        window.register = register;
-        window.login = login;
         window.likeVideo = likeVideo;
         window.showComments = showComments;
+        window.hideComments = hideComments;
+        window.addComment = addComment;
+        window.handleCommentKeypress = handleCommentKeypress;
+        window.likeComment = likeComment;
+        window.replyToComment = replyToComment;
         window.shareVideo = shareVideo;
         window.saveVideo = saveVideo;
         window.followUser = followUser;
-        window.showTerms = showTerms;
+        window.toggleFollow = toggleFollow;
+        window.showProfile = showProfile;
+        window.hideProfile = hideProfile;
+        window.shareProfile = shareProfile;
+        window.playVideoFromProfile = playVideoFromProfile;
         window.showSearch = showSearch;
+        window.hideSearch = hideSearch;
+        window.searchVideos = searchVideos;
+        window.switchSearchTab = switchSearchTab;
+        window.register = register;
+        window.login = login;
+        window.showRegister = showRegister;
+        window.showLogin = showLogin;
+        window.logout = logout;
+        window.showFeed = showFeed;
         window.showInbox = showInbox;
         window.showUpload = showUpload;
-        window.showProfile = showProfile;
-        window.showFeed = showFeed;
     </script>
 </body>
 </html>
