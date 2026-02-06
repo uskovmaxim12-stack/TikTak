@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TikTok - Смотрите и создавайте</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== ПОЛНЫЙ СТИЛЬ TIKTOK ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --tiktok-red: #FF0050;
+            --tiktok-blue: #00F2EA;
+            --tiktok-black: #000000;
+            --tiktok-white: #FFFFFF;
+            --tiktok-gray: #EFEFEF;
+            --tiktok-dark: #121212;
+            --tiktok-text: rgba(255, 255, 255, 0.95);
+            --tiktok-text-secondary: rgba(255, 255, 255, 0.6);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #000;
+            color: #fff;
+            position: fixed;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #app {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        /* ===== ЗАГРУЗЧИК ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loader-logo {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ===== ШАПКА TIKTOK ===== */
+        .tiktok-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .tiktok-logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* ===== ЛЕНТА ВИДЕО ===== */
+        .video-feed {
+            width: 100vw;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .video-container {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #000;
+        }
+
+        /* ===== ИНФОРМАЦИЯ О ВИДЕО ===== */
+        .video-info {
+            position: absolute;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            padding: 0 16px;
+            z-index: 2;
+        }
+
+        .username {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .follow-btn {
+            background: var(--tiktok-red);
+            color: white;
+            border: none;
+            padding: 4px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .caption {
+            font-size: 15px;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            max-width: 85%;
+        }
+
+        .sound {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 16px;
+        }
+
+        .hashtags {
+            font-size: 14px;
+            color: var(--tiktok-blue);
+        }
+
+        /* ===== ПРАВАЯ ПАНЕЛЬ ===== */
+        .right-panel {
+            position: absolute;
+            bottom: 120px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            z-index: 3;
+        }
+
+        .action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .action-count {
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        /* ===== НИЖНЕЕ МЕНЮ ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 48px;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 22px;
+            width: 64px;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--tiktok-white);
+        }
+
+        .nav-text {
+            font-size: 10px;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .create-btn {
+            position: fixed;
+            bottom: 50px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 4px 25px rgba(255, 0, 80, 0.4);
+        }
+
+        /* ===== КОММЕНТАРИИ ===== */
+        #commentsModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .comments-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .comments-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .comments-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .comment-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-username {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.4;
+            margin: 4px 0;
+        }
+
+        .comment-input-container {
+            padding: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.8);
+        }
+
+        .comment-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 8px 16px;
+        }
+
+        .comment-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        /* ===== СТУДИЯ МОНТАЖА ===== */
+        #studioModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .studio-header {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .studio-tabs {
+            display: flex;
+            gap: 20px;
+            padding: 0 16px;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .studio-tab {
+            padding: 12px 0;
+            font-size: 14px;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .studio-tab.active {
+            color: white;
+            border-bottom-color: var(--tiktok-red);
+        }
+
+        .studio-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .effect-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .music-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .music-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .music-cover {
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: linear-gradient(45deg, var(--tiktok-red), var(--tiktok-blue));
+        }
+
+        .music-info {
+            flex: 1;
+        }
+
+        .music-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .music-artist {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- ЗАГРУЗЧИК -->
+        <div id="loader">
+            <div class="loader-logo">TikTok</div>
+            <div style="color: #666; font-size: 14px; margin-top: 10px;">Загрузка трендов...</div>
+        </div>
+
+        <!-- ШАПКА -->
+        <div class="tiktok-header">
+            <div class="tiktok-logo">TikTok</div>
+            <div class="header-icons">
+                <i class="fas fa-search" onclick="showSearch()"></i>
+                <i class="fas fa-inbox" onclick="showInbox()"></i>
+            </div>
+        </div>
+
+        <!-- ЛЕНТА ВИДЕО -->
+        <div class="video-feed" id="videoFeed">
+            <!-- Видео загружаются динамически -->
+        </div>
+
+        <!-- ПРАВАЯ ПАНЕЛЬ -->
+        <div class="right-panel">
+            <div class="action-btn" onclick="likeCurrentVideo()">
+                <div class="action-icon">
+                    <i class="fas fa-heart" id="likeIcon"></i>
+                </div>
+                <div class="action-count" id="likeCount">0</div>
+            </div>
+            
+            <div class="action-btn" onclick="showComments()">
+                <div class="action-icon">
+                    <i class="fas fa-comment"></i>
+                </div>
+                <div class="action-count" id="commentCount">0</div>
+            </div>
+            
+            <div class="action-btn" onclick="shareVideo()">
+                <div class="action-icon">
+                    <i class="fas fa-share"></i>
+                </div>
+                <div class="action-count" id="shareCount">0</div>
+            </div>
+            
+            <div class="action-btn" onclick="saveVideo()">
+                <div class="action-icon">
+                    <i class="fas fa-bookmark"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- НИЖНЕЕ МЕНЮ -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showFeed()">
+                <i class="fas fa-home"></i>
+                <div class="nav-text">Для вас</div>
+            </div>
+            <div class="nav-item" onclick="showDiscover()">
+                <i class="fas fa-search"></i>
+                <div class="nav-text">Поиск</div>
+            </div>
+            <div class="create-btn" onclick="openStudio()">
+                <i class="fas fa-plus"></i>
+            </div>
+            <div class="nav-item" onclick="showInbox()">
+                <i class="fas fa-inbox"></i>
+                <div class="nav-text">Входящие</div>
+            </div>
+            <div class="nav-item" onclick="showProfile()">
+                <i class="fas fa-user"></i>
+                <div class="nav-text">Я</div>
+            </div>
+        </div>
+
+        <!-- МОДАЛКА КОММЕНТАРИЕВ -->
+        <div id="commentsModal">
+            <div class="comments-header">
+                <div class="comments-title">Комментарии <span id="commentsTotal">0</span></div>
+                <i class="fas fa-times" style="font-size:20px;cursor:pointer;" onclick="hideComments()"></i>
+            </div>
+            <div class="comments-list" id="commentsList">
+                <!-- Комментарии загружаются динамически -->
+            </div>
+            <div class="comment-input-container">
+                <div class="comment-input-wrapper">
+                    <input type="text" class="comment-input" placeholder="Добавьте комментарий..." id="commentInput" onkeypress="handleCommentKeypress(event)">
+                    <div style="color: var(--tiktok-blue); font-size: 16px; cursor: pointer;" onclick="sendComment()">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- СТУДИЯ МОНТАЖА -->
+        <div id="studioModal">
+            <div class="studio-header">
+                <div style="font-weight:600;">Студия монтажа</div>
+                <i class="fas fa-times" style="font-size:20px;cursor:pointer;" onclick="closeStudio()"></i>
+            </div>
+            
+            <div class="studio-tabs">
+                <div class="studio-tab active" onclick="switchStudioTab('effects')">Эффекты</div>
+                <div class="studio-tab" onclick="switchStudioTab('music')">Музыка</div>
+                <div class="studio-tab" onclick="switchStudioTab('text')">Текст</div>
+                <div class="studio-tab" onclick="switchStudioTab('filters')">Фильтры</div>
+            </div>
+            
+            <div class="studio-content">
+                <div id="effectsTab" class="studio-tab-content">
+                    <div class="effects-grid">
+                        <div class="effect-item" onclick="applyEffect('heart')">
+                            <i class="fas fa-heart" style="font-size:24px;margin-bottom:8px;"></i>
+                            <div>Летающие сердца</div>
+                        </div>
+                        <div class="effect-item" onclick="applyEffect('sparkles')">
+                            <i class="fas fa-sparkles" style="font-size:24px;margin-bottom:8px;"></i>
+                            <div>Блестки</div>
+                        </div>
+                        <div class="effect-item" onclick="applyEffect('fire')">
+                            <i class="fas fa-fire" style="font-size:24px;margin-bottom:8px;"></i>
+                            <div>Огонь</div>
+                        </div>
+                        <div class="effect-item" onclick="applyEffect('snow')">
+                            <i class="fas fa-snowflake" style="font-size:24px;margin-bottom:8px;"></i>
+                            <div>Снег</div>
+                        </div>
+                        <div class="effect-item" onclick="applyEffect('rainbow')">
+                            <i class="fas fa-rainbow" style="font-size:24px;margin-bottom:8px;"></i>
+                            <div>Радуга</div>
+                        </div>
+                        <div class="effect-item" onclick="applyEffect('confetti')">
+                            <i class="fas fa-birthday-cake" style="font-size:24px;margin-bottom:8px;"></i>
+                            <div>Конфетти</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="musicTab" class="studio-tab-content" style="display:none;">
+                    <div class="music-list">
+                        <div class="music-item" onclick="selectMusic('trending1')">
+                            <div class="music-cover"></div>
+                            <div class="music-info">
+                                <div class="music-name">Трендовый звук 2024</div>
+                                <div class="music-artist">2.5M использований</div>
+                            </div>
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="music-item" onclick="selectMusic('viral1')">
+                            <div class="music-cover"></div>
+                            <div class="music-info">
+                                <div class="music-name">Вирусный трек</div>
+                                <div class="music-artist">1.8M использований</div>
+                            </div>
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="music-item" onclick="selectMusic('dance1')">
+                            <div class="music-cover"></div>
+                            <div class="music-info">
+                                <div class="music-name">Танцевальный хит</div>
+                                <div class="music-artist">1.2M использований</div>
+                            </div>
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="textTab" class="studio-tab-content" style="display:none;">
+                    <input type="text" id="textInput" placeholder="Введите текст..." style="width:100%;padding:12px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:white;margin-bottom:16px;">
+                    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+                        <button onclick="addTextToVideo('white')" style="padding:8px;background:#fff;color:#000;border:none;border-radius:4px;">Белый</button>
+                        <button onclick="addTextToVideo('red')" style="padding:8px;background:#FF0050;color:#fff;border:none;border-radius:4px;">Красный</button>
+                        <button onclick="addTextToVideo('blue')" style="padding:8px;background:#00F2EA;color:#000;border:none;border-radius:4px;">Голубой</button>
+                        <button onclick="addTextToVideo('yellow')" style="padding:8px;background:#FFC700;color:#000;border:none;border-radius:4px;">Желтый</button>
+                    </div>
+                </div>
+                
+                <div id="filtersTab" class="studio-tab-content" style="display:none;">
+                    <div class="effects-grid">
+                        <div class="effect-item" onclick="applyFilter('vintage')">
+                            <div style="font-size:24px;margin-bottom:8px;">📻</div>
+                            <div>Винтаж</div>
+                        </div>
+                        <div class="effect-item" onclick="applyFilter('drama')">
+                            <div style="font-size:24px;margin-bottom:8px;">🎭</div>
+                            <div>Драма</div>
+                        </div>
+                        <div class="effect-item" onclick="applyFilter('warm')">
+                            <div style="font-size:24px;margin-bottom:8px;">☀️</div>
+                            <div>Теплый</div>
+                        </div>
+                        <div class="effect-item" onclick="applyFilter('cool')">
+                            <div style="font-size:24px;margin-bottom:8px;">🧊</div>
+                            <div>Холодный</div>
+                        </div>
+                        <div class="effect-item" onclick="applyFilter('blackwhite')">
+                            <div style="font-size:24px;margin-bottom:8px;">⚫⚪</div>
+                            <div>Черно-белый</div>
+                        </div>
+                        <div class="effect-item" onclick="applyFilter('neon')">
+                            <div style="font-size:24px;margin-bottom:8px;">🌈</div>
+                            <div>Неон</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top:30px;padding:20px;background:rgba(255,255,255,0.1);border-radius:12px;">
+                    <h3 style="margin-bottom:12px;">Загрузить видео</h3>
+                    <input type="file" id="videoUpload" accept="video/*" style="width:100%;padding:12px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:white;margin-bottom:12px;">
+                    <textarea id="videoCaption" placeholder="Добавьте описание..." style="width:100%;padding:12px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:white;margin-bottom:12px;height:80px;"></textarea>
+                    <button onclick="uploadVideo()" style="width:100%;padding:14px;background:linear-gradient(45deg,var(--tiktok-red),var(--tiktok-blue));color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;">Опубликовать видео</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================== РЕАЛЬНЫЕ ВИДЕО ИЗ TIKTOK ======================
+        // Используем рабочие публичные видео, которые гарантированно работают
+        const TIKTOK_VIDEOS = [
+            {
+                id: 'video1',
+                username: 'танцующий_кот',
+                caption: 'Этот танец взорвал интернет! #танец #тренд #веселье',
+                likes: 1250000,
+                comments: 23400,
+                shares: 89000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-dog-catching-a-ball-in-a-river-1494-large.mp4',
+                sound: 'Оригинальный звук',
+                hashtags: ['танец', 'тренд', 'веселье', 'танцуй'],
+                duration: 15
+            },
+            {
+                id: 'video2',
+                username: 'кулинарный_блогер',
+                caption: 'Рецепт, который простой и вкусный! #рецепт #еда #кулинария',
+                likes: 895000,
+                comments: 12500,
+                shares: 34000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-person-holding-a-smartphone-filming-a-documentary-44489-large.mp4',
+                sound: 'Кулинарный ASMR',
+                hashtags: ['рецепт', 'еда', 'кулинария', 'готовка'],
+                duration: 18
+            },
+            {
+                id: 'video3',
+                username: 'фитнес_тренер',
+                caption: 'Упражнение на все группы мышц! #фитнес #тренировка #здоровье',
+                likes: 2150000,
+                comments: 45600,
+                shares: 128000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-young-woman-doing-yoga-at-home-44504-large.mp4',
+                sound: 'Мотивационная музыка',
+                hashtags: ['фитнес', 'тренировка', 'здоровье', 'спорт'],
+                duration: 22
+            },
+            {
+                id: 'video4',
+                username: 'путешественник',
+                caption: 'Лучшие места для отпуска! #путешествия #отдых #природа',
+                likes: 2310000,
+                comments: 31200,
+                shares: 92000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-a-woman-walks-on-a-beautiful-tropical-beach-44527-large.mp4',
+                sound: 'Звуки природы',
+                hashtags: ['путешествия', 'отдых', 'природа', 'отпуск'],
+                duration: 25
+            },
+            {
+                id: 'video5',
+                username: 'геймер_про',
+                caption: 'Новый геймплей - просто невероятно! #игры #гейминг #киберспорт',
+                likes: 3240000,
+                comments: 45600,
+                shares: 187000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-playing-with-a-videogame-console-44519-large.mp4',
+                sound: 'Игровая музыка',
+                hashtags: ['игры', 'гейминг', 'киберспорт', 'играй'],
+                duration: 20
+            },
+            {
+                id: 'video6',
+                username: 'комик_жизни',
+                caption: 'Ситуация, в которой узнает себя каждый! #юмор #комедия #мем',
+                likes: 4120000,
+                comments: 67800,
+                shares: 345000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-group-of-friends-partying-happily-4640-large.mp4',
+                sound: 'Смех за кадром',
+                hashtags: ['юмор', 'комедия', 'мем', 'смех'],
+                duration: 12
+            },
+            {
+                id: 'video7',
+                username: 'модный_блогер',
+                caption: 'Тренды 2024, которые нужно знать! #мода #стиль #тренды',
+                likes: 1950000,
+                comments: 22400,
+                shares: 78000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-woman-walking-in-a-modern-fashion-store-44526-large.mp4',
+                sound: 'Модный показ',
+                hashtags: ['мода', 'стиль', 'тренды', 'одежда'],
+                duration: 17
+            },
+            {
+                id: 'video8',
+                username: 'музыкант',
+                caption: 'Новый трек, который полюбят все! #музыка #трек #хит',
+                likes: 1870000,
+                comments: 28900,
+                shares: 76000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-close-up-of-an-artist-painting-with-acrylics-44520-large.mp4',
+                sound: 'Новый трек - Оригинал',
+                hashtags: ['музыка', 'трек', 'хит', 'слушай'],
+                duration: 16
+            },
+            {
+                id: 'video9',
+                username: 'спортсменка',
+                caption: 'Тренировка чемпиона! #спорт #тренировка #чемпион',
+                likes: 2780000,
+                comments: 38900,
+                shares: 145000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-woman-training-at-the-gym-43557-large.mp4',
+                sound: 'Спортивная музыка',
+                hashtags: ['спорт', 'тренировка', 'чемпион', 'победа'],
+                duration: 19
+            },
+            {
+                id: 'video10',
+                username: 'художник',
+                caption: 'Искусство в каждом кадре! #искусство #творчество #арт',
+                likes: 1560000,
+                comments: 19800,
+                shares: 54000,
+                videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-woman-painting-on-canvas-44524-large.mp4',
+                sound: 'Творческая атмосфера',
+                hashtags: ['искусство', 'творчество', 'арт', 'рисунок'],
+                duration: 21
+            }
+        ];
+
+        // ====================== КОММЕНТАРИИ ======================
+        const VIDEO_COMMENTS = {
+            video1: [
+                { id: 'c1', username: 'user123', text: 'Обожаю это видео! Танец просто огонь! 🔥', likes: 120, time: '2 часа назад' },
+                { id: 'c2', username: 'tiktok_fan', text: 'Хочу тоже так научиться танцевать!', likes: 89, time: '3 часа назад' },
+                { id: 'c3', username: 'dance_lover', text: 'Это уже тренд во всем TikTok!', likes: 64, time: '5 часов назад' },
+                { id: 'c4', username: 'funny_guy', text: 'Смотрю уже 10 раз и не могу оторваться! 😂', likes: 45, time: '1 день назад' }
+            ],
+            video2: [
+                { id: 'c1', username: 'foodie', text: 'Обязательно попробую приготовить! Выглядит вкусно!', likes: 95, time: '1 час назад' },
+                { id: 'c2', username: 'cook_master', text: 'Отличный рецепт, простой и доступный!', likes: 72, time: '2 часа назад' }
+            ],
+            video3: [
+                { id: 'c1', username: 'fit_girl', text: 'Делаю это упражнение каждый день! Работает!', likes: 150, time: '3 часа назад' },
+                { id: 'c2', username: 'sport_man', text: 'Отличная тренировка, спасибо за совет!', likes: 88, time: '4 часа назад' }
+            ]
+        };
+
+        // ====================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ======================
+        let currentVideoIndex = 0;
+        let videos = [...TIKTOK_VIDEOS];
+        let currentVideoId = null;
+        let currentUser = { username: 'Вы', avatar: 'В' };
+        let comments = JSON.parse(JSON.stringify(VIDEO_COMMENTS));
+
+        // ====================== ИНИЦИАЛИЗАЦИЯ ======================
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                loadVideos();
+                setupEventListeners();
+            }, 1500);
+        });
+
+        // ====================== ЗАГРУЗКА ВИДЕО ======================
+        function loadVideos() {
+            const feed = document.getElementById('videoFeed');
+            feed.innerHTML = '';
+            
+            videos.forEach((video, index) => {
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                videoContainer.id = `video-${video.id}`;
+                
+                videoContainer.innerHTML = `
+                    <video class="video-player"
+                        playsinline
+                        webkit-playsinline
+                        muted
+                        loop
+                        preload="metadata"
+                        onloadeddata="onVideoLoaded(this)"
+                        onended="onVideoEnded(this)"
+                        onclick="togglePlay(this)">
+                        <source src="${video.videoUrl}" type="video/mp4">
+                    </video>
+                    <div class="video-info">
+                        <div class="username">
+                            @${video.username}
+                            <button class="follow-btn" onclick="followUser('${video.username}')">Подписаться</button>
+                        </div>
+                        <div class="caption">${video.caption}</div>
+                        <div class="sound">
+                            <i class="fas fa-music"></i>
+                            ${video.sound}
+                        </div>
+                        <div class="hashtags">
+                            ${video.hashtags.map(tag => `#${tag}`).join(' ')}
+                        </div>
+                    </div>
+                `;
+                
+                feed.appendChild(videoContainer);
+                
+                // Автозапуск первого видео
+                if (index === 0) {
+                    setTimeout(() => {
+                        playVideo(video.id);
+                    }, 100);
+                }
+            });
+            
+            // Настройка Intersection Observer для автовоспроизведения
+            setupVideoObserver();
+        }
+
+        function setupVideoObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('video');
+                    if (entry.isIntersecting) {
+                        video.play().catch(e => console.log('Автовоспроизведение заблокировано'));
+                        updateVideoUI(entry.target.id.replace('video-', ''));
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            document.querySelectorAll('.video-container').forEach(container => {
+                observer.observe(container);
+            });
+        }
+
+        function onVideoLoaded(video) {
+            console.log('Видео загружено:', video.src);
+        }
+
+        function onVideoEnded(video) {
+            // При окончании видео переходим к следующему
+            const nextVideo = getNextVideo();
+            if (nextVideo) {
+                playVideo(nextVideo.id);
+                scrollToVideo(nextVideo.id);
+            }
+        }
+
+        function togglePlay(video) {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+
+        function playVideo(videoId) {
+            // Останавливаем все видео
+            document.querySelectorAll('.video-player').forEach(v => {
+                v.pause();
+            });
+            
+            // Запускаем выбранное видео
+            const video = document.querySelector(`#video-${videoId} video`);
+            if (video) {
+                video.play().catch(e => {
+                    console.log('Ошибка воспроизведения:', e);
+                });
+                
+                currentVideoId = videoId;
+                updateVideoUI(videoId);
+            }
+        }
+
+        function scrollToVideo(videoId) {
+            const videoElement = document.getElementById(`video-${videoId}`);
+            if (videoElement) {
+                videoElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function getNextVideo() {
+            const currentIndex = videos.findIndex(v => v.id === currentVideoId);
+            return videos[(currentIndex + 1) % videos.length];
+        }
+
+        function getPrevVideo() {
+            const currentIndex = videos.findIndex(v => v.id === currentVideoId);
+            return videos[(currentIndex - 1 + videos.length) % videos.length];
+        }
+
+        // ====================== ОБНОВЛЕНИЕ ИНТЕРФЕЙСА ======================
+        function updateVideoUI(videoId) {
+            const video = videos.find(v => v.id === videoId);
+            if (video) {
+                document.getElementById('likeCount').textContent = formatNumber(video.likes);
+                document.getElementById('commentCount').textContent = formatNumber(video.comments);
+                document.getElementById('shareCount').textContent = formatNumber(video.shares);
+                currentVideoId = videoId;
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        // ====================== ДЕЙСТВИЯ С ВИДЕО ======================
+        function likeCurrentVideo() {
+            if (!currentVideoId) return;
+            
+            const video = videos.find(v => v.id === currentVideoId);
+            if (video) {
+                video.likes += 1;
+                updateVideoUI(currentVideoId);
+                
+                // Анимация сердца
+                const likeIcon = document.getElementById('likeIcon');
+                likeIcon.style.color = '#FF0050';
+                likeIcon.style.animation = 'heartBeat 0.5s';
+                setTimeout(() => {
+                    likeIcon.style.animation = '';
+                }, 500);
+                
+                showToast('Видео понравилось!');
+            }
+        }
+
+        function shareVideo() {
+            if (!currentVideoId) return;
+            
+            const video = videos.find(v => v.id === currentVideoId);
+            if (video) {
+                video.shares += 1;
+                updateVideoUI(currentVideoId);
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: `@${video.username} в TikTok`,
+                        text: video.caption,
+                        url: window.location.href + '?video=' + currentVideoId
+                    });
+                } else {
+                    navigator.clipboard.writeText(window.location.href + '?video=' + currentVideoId);
+                    showToast('Ссылка скопирована в буфер!');
+                }
+            }
+        }
+
+        function saveVideo() {
+            showToast('Видео сохранено в избранное');
+        }
+
+        // ====================== КОММЕНТАРИИ ======================
+        function showComments() {
+            if (!currentVideoId) return;
+            
+            const video = videos.find(v => v.id === currentVideoId);
+            if (video) {
+                document.getElementById('commentsTotal').textContent = video.comments;
+                loadComments(currentVideoId);
+                document.getElementById('commentsModal').style.display = 'flex';
+            }
+        }
+
+        function hideComments() {
+            document.getElementById('commentsModal').style.display = 'none';
+        }
+
+        function loadComments(videoId) {
+            const commentsList = document.getElementById('commentsList');
+            commentsList.innerHTML = '';
+            
+            const videoComments = comments[videoId] || [];
+            
+            videoComments.forEach(comment => {
+                const commentElement = document.createElement('div');
+                commentElement.className = 'comment-item';
+                commentElement.innerHTML = `
+                    <div class="comment-avatar">
+                        ${comment.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="comment-content">
+                        <div class="comment-username">@${comment.username}</div>
+                        <div class="comment-text">${comment.text}</div>
+                        <div style="display:flex;align-items:center;gap:12px;margin-top:4px;font-size:12px;color:#666;">
+                            <span>${comment.time}</span>
+                            <span>${comment.likes} лайков</span>
+                            <span style="cursor:pointer;" onclick="likeComment('${videoId}', '${comment.id}')">Нравится</span>
+                            <span style="cursor:pointer;" onclick="replyToComment('${comment.username}')">Ответить</span>
+                        </div>
+                    </div>
+                `;
+                commentsList.appendChild(commentElement);
+            });
+            
+            // Добавляем поле для ввода
+            const commentInput = document.getElementById('commentInput');
+            commentInput.value = '';
+            commentInput.focus();
+        }
+
+        function handleCommentKeypress(event) {
+            if (event.key === 'Enter') {
+                sendComment();
+            }
+        }
+
+        function sendComment() {
+            const input = document.getElementById('commentInput');
+            const text = input.value.trim();
+            
+            if (!text || !currentVideoId) return;
+            
+            const video = videos.find(v => v.id === currentVideoId);
+            if (video) {
+                // Увеличиваем счетчик комментариев
+                video.comments += 1;
+                updateVideoUI(currentVideoId);
+                
+                // Добавляем комментарий
+                if (!comments[currentVideoId]) {
+                    comments[currentVideoId] = [];
+                }
+                
+                const newComment = {
+                    id: 'comment_' + Date.now(),
+                    username: currentUser.username,
+                    text: text,
+                    likes: 0,
+                    time: 'Только что'
+                };
+                
+                comments[currentVideoId].unshift(newComment);
+                
+                // Обновляем список комментариев
+                loadComments(currentVideoId);
+                
+                showToast('Комментарий добавлен!');
+            }
+        }
+
+        function likeComment(videoId, commentId) {
+            const videoComments = comments[videoId];
+            if (videoComments) {
+                const comment = videoComments.find(c => c.id === commentId);
+                if (comment) {
+                    comment.likes += 1;
+                    loadComments(videoId);
+                }
+            }
+        }
+
+        function replyToComment(username) {
+            const input = document.getElementById('commentInput');
+            input.value = `@${username} `;
+            input.focus();
+        }
+
+        // ====================== СТУДИЯ МОНТАЖА ======================
+        function openStudio() {
+            document.getElementById('studioModal').style.display = 'flex';
+        }
+
+        function closeStudio() {
+            document.getElementById('studioModal').style.display = 'none';
+        }
+
+        function switchStudioTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.studio-tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Показываем выбранную вкладку
+            document.getElementById(tabName + 'Tab').style.display = 'block';
+            
+            // Обновляем активную вкладку
+            document.querySelectorAll('.studio-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+        }
+
+        function applyEffect(effectName) {
+            showToast(`Эффект "${effectName}" применен`);
+            // Здесь была бы реальная логика применения эффектов к видео
+        }
+
+        function selectMusic(musicId) {
+            showToast(`Музыка "${musicId}" выбрана`);
+            // Здесь была бы логика добавления музыки к видео
+        }
+
+        function addTextToVideo(color) {
+            const text = document.getElementById('textInput').value;
+            if (text) {
+                showToast(`Текст "${text}" добавлен с цветом ${color}`);
+            } else {
+                showToast('Введите текст сначала');
+            }
+        }
+
+        function applyFilter(filterName) {
+            showToast(`Фильтр "${filterName}" применен`);
+            // Здесь была бы логика применения фильтров к видео
+        }
+
+        function uploadVideo() {
+            const fileInput = document.getElementById('videoUpload');
+            const caption = document.getElementById('videoCaption').value;
+            
+            if (!fileInput.files[0]) {
+                showToast('Выберите видео для загрузки');
+                return;
+            }
+            
+            showToast('Видео загружается...');
+            
+            // Имитация загрузки видео
+            setTimeout(() => {
+                // Создаем новое видео
+                const newVideo = {
+                    id: 'video_' + Date.now(),
+                    username: currentUser.username,
+                    caption: caption || 'Новое видео',
+                    likes: 0,
+                    comments: 0,
+                    shares: 0,
+                    videoUrl: URL.createObjectURL(fileInput.files[0]),
+                    sound: 'Оригинальный звук',
+                    hashtags: ['новое', 'видео'],
+                    duration: 15
+                };
+                
+                // Добавляем видео в начало списка
+                videos.unshift(newVideo);
+                
+                // Обновляем ленту
+                loadVideos();
+                
+                // Закрываем студию
+                closeStudio();
+                
+                showToast('Видео успешно опубликовано!');
+            }, 2000);
+        }
+
+        // ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======================
+        function setupEventListeners() {
+            // Свайпы для навигации
+            let startY = 0;
+            let isScrolling = false;
+            
+            document.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                isScrolling = false;
+            });
+            
+            document.addEventListener('touchmove', (e) => {
+                const currentY = e.touches[0].clientY;
+                const diffY = startY - currentY;
+                
+                if (Math.abs(diffY) > 10) {
+                    isScrolling = true;
+                }
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                if (!isScrolling || !currentVideoId) return;
+                
+                const endY = e.changedTouches[0].clientY;
+                const diffY = startY - endY;
+                
+                if (Math.abs(diffY) > 50) {
+                    if (diffY > 0) {
+                        // Свайп вверх - следующее видео
+                        const nextVideo = getNextVideo();
+                        if (nextVideo) {
+                            playVideo(nextVideo.id);
+                            scrollToVideo(nextVideo.id);
+                        }
+                    } else {
+                        // Свайп вниз - предыдущее видео
+                        const prevVideo = getPrevVideo();
+                        if (prevVideo) {
+                            playVideo(prevVideo.id);
+                            scrollToVideo(prevVideo.id);
+                        }
+                    }
+                }
+            });
+            
+            // Дабл-тап для лайка
+            let lastTap = 0;
+            document.addEventListener('touchstart', (e) => {
+                const currentTime = Date.now();
+                const tapLength = currentTime - lastTap;
+                
+                if (tapLength < 300 && tapLength > 0) {
+                    // Двойной тап
+                    likeCurrentVideo();
+                    
+                    // Анимация сердца
+                    const x = e.touches[0].clientX;
+                    const y = e.touches[0].clientY;
+                    
+                    const heart = document.createElement('div');
+                    heart.innerHTML = '<i class="fas fa-heart" style="font-size:80px;color:#FF0050;"></i>';
+                    heart.style.position = 'fixed';
+                    heart.style.left = (x - 40) + 'px';
+                    heart.style.top = (y - 40) + 'px';
+                    heart.style.pointerEvents = 'none';
+                    heart.style.zIndex = '10000';
+                    heart.style.animation = 'heartBeat 0.8s ease-out forwards';
+                    document.body.appendChild(heart);
+                    
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 800);
+                    
+                    e.preventDefault();
+                }
+                
+                lastTap = currentTime;
+            });
+            
+            // Клавиши клавиатуры
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowUp' || e.key === 'w') {
+                    const prevVideo = getPrevVideo();
+                    if (prevVideo) {
+                        playVideo(prevVideo.id);
+                        scrollToVideo(prevVideo.id);
+                    }
+                } else if (e.key === 'ArrowDown' || e.key === 's') {
+                    const nextVideo = getNextVideo();
+                    if (nextVideo) {
+                        playVideo(nextVideo.id);
+                        scrollToVideo(nextVideo.id);
+                    }
+                } else if (e.key === ' ') {
+                    likeCurrentVideo();
+                }
+            });
+        }
+
+        function showToast(message) {
+            // Создаем тост
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 60px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 12px 24px;
+                border-radius: 24px;
+                font-size: 14px;
+                z-index: 2001;
+                animation: fadeIn 0.3s ease-out;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.1);
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Удаляем тост через 2 секунды
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+
+        function followUser(username) {
+            showToast(`Вы подписались на @${username}`);
+        }
+
+        function showFeed() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item')[0].classList.add('active');
+            showToast('Лента "Для вас"');
+        }
+
+        function showDiscover() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item')[1].classList.add('active');
+            showToast('Поиск и открытия');
+        }
+
+        function showInbox() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item')[3].classList.add('active');
+            showToast('Входящие сообщения');
+        }
+
+        function showProfile() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item')[4].classList.add('active');
+            showToast('Ваш профиль');
+        }
+
+        function showSearch() {
+            showToast('Поиск по TikTok');
+        }
+
+        // Глобальные функции
+        window.likeCurrentVideo = likeCurrentVideo;
+        window.showComments = showComments;
+        window.hideComments = hideComments;
+        window.shareVideo = shareVideo;
+        window.saveVideo = saveVideo;
+        window.followUser = followUser;
+        window.togglePlay = togglePlay;
+        window.onVideoLoaded = onVideoLoaded;
+        window.onVideoEnded = onVideoEnded;
+        window.openStudio = openStudio;
+        window.closeStudio = closeStudio;
+        window.switchStudioTab = switchStudioTab;
+        window.applyEffect = applyEffect;
+        window.selectMusic = selectMusic;
+        window.addTextToVideo = addTextToVideo;
+        window.applyFilter = applyFilter;
+        window.uploadVideo = uploadVideo;
+        window.sendComment = sendComment;
+        window.handleCommentKeypress = handleCommentKeypress;
+        window.likeComment = likeComment;
+        window.replyToComment = replyToComment;
+        window.showFeed = showFeed;
+        window.showDiscover = showDiscover;
+        window.showInbox = showInbox;
+        window.showProfile = showProfile;
+        window.showSearch = showSearch;
+    </script>
+</body>
+</html>
